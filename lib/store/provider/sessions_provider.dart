@@ -1,10 +1,9 @@
 import 'dart:math';
 
 import 'package:chat/config/GlobalConfig.dart';
-import 'package:chat/store/model/friend.dart';
+import 'package:chat/socket/socket_manager.dart';
 import 'package:chat/store/model/message.dart';
 import 'package:chat/store/model/session.dart';
-import 'package:chat/store/msg/msg.dart';
 import 'package:chat/utils/shared_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
@@ -13,14 +12,18 @@ class SessionProvider with ChangeNotifier {
 
   List<Session> _listSession = new List<Session>();
   Map<int ,Session> _mapSession = new Map();
-  Map<int ,Session> _mapFriendIdSession = new Map();
   bool initdata = false;
 
   List get listSession => _listSession;
   Map get mapSession => _mapSession;
 
   getSessionIdByUserId(int id) {
-    return _mapFriendIdSession[id].id;
+    for(Session session in _listSession) {
+      if(session.targetId == id) {
+        return session.sessionId;
+      }
+    }
+    return null;
   }
 
   getRandomTime() {
@@ -57,20 +60,28 @@ class SessionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  addUnReadNum(Message message) {
+  updateByReceivedMessage(Message message) {
     _mapSession[message.sessionId].unreadnum++;
-
+    if(message.type == 0) {
+      _mapSession[message.sessionId].content = message.content;
+    } else if(message.type == 2) {
+      _mapSession[message.sessionId].content = "语音";
+    }
+    _mapSession[message.sessionId].updateTime = getTime(DateTime.now());
+    notifyListeners();
   }
 
   updateContent(Message message) {
     if(message.type == 0) {
       _mapSession[message.sessionId].content = message.content;
+    } else if(message.type == 2) {
+      _mapSession[message.sessionId].content = "语音";
     }
+    notifyListeners();
   }
 
   clear() {
     _listSession.clear();
-    _mapFriendIdSession.clear();
     _mapSession.clear();
   }
 
@@ -78,9 +89,7 @@ class SessionProvider with ChangeNotifier {
     if(GlobalConfig.initSession == false) {
       GlobalConfig.initSession = true;
       _listSession.clear();
-      _mapFriendIdSession.clear();
       _mapSession.clear();
-      print("init session");
       Dio dio = new Dio();
       dio.options = new Options(
         headers : {
@@ -93,7 +102,7 @@ class SessionProvider with ChangeNotifier {
           Session s = new Session(
             id: session.containsKey("id") ? session['id'] : null,
             sessionId: session.containsKey("sessionId") ? session['sessionId'] : null,
-            userId: session.containsKey("targetId") ? session['targetId'] : null,
+            targetId: session.containsKey("targetId") ? session['targetId'] : null,
             nickName: session.containsKey("nickname") ? session['nickname'] : null,
             content: session.containsKey("content") ? session['content'] : null,
             avatarUrl: null,
@@ -102,14 +111,16 @@ class SessionProvider with ChangeNotifier {
           );
           _listSession.add(s);
           _mapSession[s.sessionId] = s;
-          _mapFriendIdSession[s.userId] = s;
         }
+        notifyListeners();
       }
-      notifyListeners();
+      socketManage.isOnline = true;
+      socketManage.conn();
     }
   }
 
   clearUnreadSession(int sessionId) {
     _mapSession[sessionId].unreadnum = 0;
   }
+
 }

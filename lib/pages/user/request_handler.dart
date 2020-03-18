@@ -1,6 +1,5 @@
 
 import 'package:chat/config/GlobalConfig.dart';
-import 'package:chat/socket/websocket.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/Request.dart';
 import 'package:chat/store/provider/request_provider.dart';
@@ -152,7 +151,7 @@ class RequestItem extends StatelessWidget {
       Toast.toast(context, msg: "发生错误:" + response.data['message']);
     }
   }
-  
+
 
 
 }

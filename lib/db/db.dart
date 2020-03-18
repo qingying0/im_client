@@ -1,7 +1,5 @@
 
 import 'dart:io';
-
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBManager {
@@ -15,14 +13,20 @@ class DBManager {
   static String messageTableName = "message";
   static String messageCreateSql = '''
             CREATE TABLE message (
-            id` integer NOT NULL PRIMARY KEY,
-            content` text NOT NULL,
-            create_time` integer NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            send_id` integer NOT NULL,
-            type` integer NOT NULL,
-            status` integer NOT NULL,
-            session_id` integer NOT NULL)
+            `id` integer NOT NULL PRIMARY KEY,
+            `content` text NOT NULL,
+            `create_time` integer NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `send_id` integer NOT NULL,
+            `type` integer NOT NULL,
+            `status` integer NOT NULL,
+            `session_id` integer NOT NULL,
+            `username` text NOT NULL,
+            `avatar_url` text NOT NULL)
           ''';
+
+  DBManager() {
+    init();
+  }
 
   static init() async {
     var databasePath = await getDatabasesPath();
@@ -31,15 +35,13 @@ class DBManager {
     if(Platform.isIOS) {
       path = databasePath + "/" + dbName;
     }
-
-    _database = await openDatabase(path,version: _VERSION, 
+    _database = await openDatabase(path,version: _VERSION,
       onCreate: (Database db, int version) {
+        isTableExist(messageTableName).then((v) {
+          if(!v) {
+            _database.execute(messageCreateSql);
+          }
       });
-
-    isTableExist(messageTableName).then((v) {
-      if(!v) {
-        _database.execute(messageCreateSql);
-      }  
     });
   }
 

@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/pages/user/person.dart';
-import 'package:chat/store/index.dart';
-import 'package:chat/store/provider//user_provider.dart';
 import 'package:chat/utils/http_utils.dart';
 import 'package:chat/utils/toast.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +72,6 @@ class _AddFriend extends State<AddFriend> {
       GlobalConfig.baseUrl + "/user/search_by_phone?phone=$search",
       options: HttpUtils.getOption(context) );
     var data = response.data['data'];
-    print(data);
     if(response.data['code'] == 200) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) {

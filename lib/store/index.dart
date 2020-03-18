@@ -3,6 +3,7 @@ import 'package:chat/store/provider/message_provider.dart';
 import 'package:chat/store/provider/request_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:chat/store/provider/userinfo_provider.dart';
+import 'package:chat/store/provider/voice_record_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'provider//user_provider.dart';
@@ -20,6 +21,7 @@ class Store {
         ChangeNotifierProvider(builder: (_)=>SessionProvider(),),
         ChangeNotifierProvider(builder: (_)=>MessageProvider(),),
         ChangeNotifierProvider(builder: (_)=>RequestProvider(),),
+        ChangeNotifierProvider(builder: (_)=>VoiceRecordProvider(),),
       ],
       child: child,
     );

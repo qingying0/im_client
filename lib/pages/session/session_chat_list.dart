@@ -2,17 +2,15 @@ import 'package:chat/db/message_dao.dart';
 import 'package:chat/pages/login/login.dart';
 import 'package:chat/pages/user/user_data.dart';
 import 'package:chat/store/model/session.dart';
-import 'package:chat/store/msg/msg.dart';
-import 'package:chat/store/msg/online_msg.dart';
-import 'package:chat/store/provider//user_provider.dart';
 import 'package:chat/store/index.dart';
+import 'package:chat/store/msg/enums.dart';
 import 'package:chat/store/provider/message_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:chat/store/provider/userinfo_provider.dart';
+import 'package:chat/socket/socket_manager.dart';
 import 'package:chat/utils/shared_utils.dart';
 import 'package:flutter/material.dart';
 import 'session_chat.dart';
-import 'package:chat/socket/websocket.dart';
 
 class SessionChatList extends StatefulWidget {
 
@@ -67,10 +65,10 @@ class _SessionChatList extends State<SessionChatList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
-                            new Container(child: new ClipOval(
-                              child: snapshot.avatarUrl == null ? Image.network("http://q3jbezsht.bkt.clouddn.com/489a86ddd283bafd.jpg") :
-                              Image.network(snapshot.avatarUrl),
-                            ),),
+                            new Container(child:
+                                ClipOval(
+                                child:Image.network(snapshot.avatarUrl))
+                            ),
                             new Container(
                               margin: EdgeInsets.only(left: 6.0),
                               child: new Column(
@@ -155,16 +153,16 @@ class _SessionChatList extends State<SessionChatList> {
     await sharedDeleteData("avatarUrl");
     await sharedDeleteData("description");
     await sharedDeleteData("pushId");
-    
+    socketManage.isOnline = false;
+    socketManage.sendOffLine();
     Store.value<SessionProvider>(context).clear();
     Store.value<MessageProvider>(context).clear();
     messageDao.clear();
-    webSocket.sendMsg(new Msg(type: MsgType.ONLINE.index, data: new OnlineMsg(userId: id, type: 1).toJson()).toJson());
     Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) {
           return Login();
         }
     ));
-  
+
   }
 }

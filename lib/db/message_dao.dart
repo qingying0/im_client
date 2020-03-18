@@ -31,7 +31,7 @@ class MessageDao {
 
   Future insert(Message message) async {
     Database db = await DBManager.getCurrentDatabase();
-    return await db.insert(this.name, toMap(message));
+    return await db.insert(this.name, message.toMap());
   }
 
   Future clear() async {
@@ -41,16 +41,4 @@ class MessageDao {
     );
   }
 
-  Map<String, dynamic> toMap(Message message) {
-    Map<String, dynamic> map = {
-      "id": message.id,
-      "send_id": message.sendId,
-      "session_id": message.sessionId,
-      "type": message.type,
-      "create_time": message.createTime.millisecondsSinceEpoch,
-      "content": message.content,
-      "status": message.status,
-    };
-    return map;
-  }
 }

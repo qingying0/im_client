@@ -1,9 +1,6 @@
 import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/pages/login/register.dart';
 import 'package:chat/store/index.dart';
-import 'package:chat/store/msg/ack_msg.dart';
-import 'package:chat/store/msg/msg.dart';
-import 'package:chat/store/msg/online_msg.dart';
 import 'package:chat/store/provider//user_provider.dart';
 import 'package:chat/store/provider/friends_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
@@ -13,7 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:chat/utils/shared_utils.dart';
 import 'package:chat/pages/home/mainhome.dart';
 import 'package:chat/utils/toast.dart';
-import 'package:chat/socket/websocket.dart';
+import 'package:chat/socket/socket_manager.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -29,7 +26,7 @@ class _Login extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    webSocket.setContext(context);
+    socketManage.setContext(context);
     return new Scaffold(
         body: new Stack(children: <Widget>[
           new Opacity(
@@ -75,7 +72,6 @@ class _Login extends State<Login> {
                           ),
                           Store.connect<UserInfoProvider>(
                             builder: (context, snapshot, child) {
-                              print('first page counter widget rebuild');
                               return new FlatButton(
                                 child: new Container(
                                   margin: EdgeInsets.only(top: 30),
@@ -127,8 +123,7 @@ class _Login extends State<Login> {
     var phone = _phoneController.text;
     var password = _passwordController.text;
     Dio dio = new Dio();
-    var response = await dio.post("http://" + GlobalConfig.address + "/login?phone=$phone&password=$password");
-    print(response);
+    var response = await dio.get("http://" + GlobalConfig.address + "/login?phone=$phone&password=$password");
     var data = response.data['data'];
     if(response.data['code'] == 200) {
       sharedAddAndUpdate('username', String, data['username']);
@@ -139,7 +134,7 @@ class _Login extends State<Login> {
       Store.value<UserInfoProvider>(context).init();
       GlobalConfig.setInitFriend();
       GlobalConfig.setInitSession();
-      webSocket.sendMsg(new Msg(type: MsgType.ONLINE.index, data: OnlineMsg(type: OnlineEnum.ONLINE.index, userId: data['id']).toJson()).toJson());
+
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) {
           return MainHome();

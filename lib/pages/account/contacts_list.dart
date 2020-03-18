@@ -2,11 +2,8 @@ import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/pages/account/friend_list.dart';
 import 'package:chat/pages/account/group_list.dart';
 import 'package:chat/pages/user/request_handler.dart';
-import 'package:chat/socket/websocket.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/Request.dart';
-import 'package:chat/store/msg/msg.dart';
-import 'package:chat/store/msg/online_msg.dart';
 import 'package:chat/store/provider/friends_provider.dart';
 import 'package:chat/store/provider/request_provider.dart';
 import 'package:chat/utils/http_utils.dart';
@@ -31,7 +28,7 @@ class _ContactsList extends State<ContactsList> {
 
   @override
   Widget build(BuildContext context) {
-    
+
     return new DefaultTabController(
         length: 2,
         child: Scaffold(
@@ -73,7 +70,7 @@ class _ContactsList extends State<ContactsList> {
                 return AddFriend();
               },
               ).then((val) {
-                
+
               });
             },
             child: new Icon(Icons.group_add),
@@ -94,7 +91,7 @@ class _ContactsList extends State<ContactsList> {
       for (var request in listRequest) {
         Store.value<RequestProvider>(context).addRequest(new Request(id: request['id'], username: request['username'], content: request['content'], type: request['type'], status: request['status'], avatarUrl: request['avatarUrl']));
       }
-      // 
+      //
     } else {
       Toast.toast(context, msg: "发生错误:" + response.data['message']);
     }

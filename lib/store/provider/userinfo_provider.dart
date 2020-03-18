@@ -8,9 +8,6 @@ class UserInfoProvider with ChangeNotifier {
 
   UserInfoProvider() {
     init();
-    // setId(100);
-    // setUsername("zhangsan");
-    // setAvatarUrl("https://pic4.zhimg.com/da8e974dc_is.jpg");
   }
 
   int get id => _userInfo.id;

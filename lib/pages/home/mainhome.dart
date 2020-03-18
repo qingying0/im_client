@@ -1,19 +1,10 @@
 import 'package:chat/pages/account/contacts_list.dart';
-import 'package:chat/pages/login/login.dart';
-import 'package:chat/pages/session/session_chat.dart';
 import 'package:chat/pages/session/session_chat_list.dart';
-import 'package:chat/socket/websocket.dart';
+import 'package:chat/socket/socket_manager.dart';
 import 'package:chat/store/index.dart';
-import 'package:chat/store/index.dart';
-import 'package:chat/store/model/session.dart';
-import 'package:chat/store/msg/msg.dart';
-import 'package:chat/store/msg/online_msg.dart';
 import 'package:chat/store/provider/friends_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
-import 'package:chat/store/provider/user_provider.dart';
-import 'package:chat/store/provider/userinfo_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:chat/utils/shared_utils.dart';
 
 class MainHome extends StatefulWidget{
 
@@ -25,8 +16,6 @@ class MainHome extends StatefulWidget{
 
 class _MainHome extends State<MainHome> {
 
-
-
   int _currentIndex = 0;
   List _pageList = [
     SessionChatList(),
@@ -34,17 +23,11 @@ class _MainHome extends State<MainHome> {
   ];
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Store.value<FriendsProvider>(context).init();
     Store.value<SessionProvider>(context).init();
-    webSocket.isOnline = true;
-    webSocket.setContext(context);
+    socketManage.setContext(context);
+    socketManage.isOnline = true;
     return new Scaffold(
       bottomNavigationBar: new BottomNavigationBar(
         items: [

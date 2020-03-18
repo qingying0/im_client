@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/socket/upload.dart';
 import 'package:chat/store/index.dart';
@@ -27,7 +29,7 @@ class UserData extends StatelessWidget {
         body: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
-          
+
           children: <Widget>[
             new Container(
               margin: EdgeInsets.only(top: 30),
@@ -40,11 +42,11 @@ class UserData extends StatelessWidget {
                   onPressed: () {
                     getImage();
                   },
-                ), 
+                ),
             ),
             new TextField(
               controller: _usernameController,
-              
+
               decoration: new InputDecoration(
                 hintText: "用户名",
                 icon: new Icon(
@@ -90,12 +92,13 @@ class UserData extends StatelessWidget {
 
   getImage() async{
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    upload.uploadfile(image).then((url) {
-      print("url = " + url);
+    int id = await sharedGetData("id");
+    String fileType = image.path.split(".")[image.path.split(".").length - 1];
+    print(fileType);
+    String fileName = "avatarUrl:" + id.toString() + "." + fileType;
+    upload.uploadfile(image, 0).then((url) {
       updateAvatar(url);
-
     });
-
   }
 
   updateAvatar(String url) async{
@@ -104,9 +107,8 @@ class UserData extends StatelessWidget {
       headers : {
         "token": await sharedGetData("token"),
     });
-    var response = await dio.post(GlobalConfig.baseUrl + "/user/updateAvatar?avatarUrl=$url");
+    var response = await dio.put(GlobalConfig.baseUrl + "/user?avatarUrl=$url");
     if(response.data['code'] == 200) {
-      print(response);
       Store.value<UserInfoProvider>(context).setAvatarUrl(url);
     }
   }
@@ -119,7 +121,7 @@ class UserData extends StatelessWidget {
     });
     String username = _usernameController.text;
     String description = _descriptionController.text;
-    var response = await dio.post(GlobalConfig.baseUrl + "/user/updateData?username=$username&description=$description");
+    var response = await dio.put(GlobalConfig.baseUrl + "/user?username=$username&description=$description");
     if(response.data['code'] == 200) {
       Store.value<UserInfoProvider>(context).setUsername(_usernameController.text);
       Store.value<UserInfoProvider>(context).setDescription(_descriptionController.text);

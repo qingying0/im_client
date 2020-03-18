@@ -2,7 +2,7 @@
 
 class Session {
   int id;
-  int userId;
+  int targetId;
   int sessionId;
   String nickName;
   String content;
@@ -13,7 +13,7 @@ class Session {
   List<int> listMessageId;
   int status;
 
-  Session({this.sessionId, this.userId, this.nickName, this.avatarUrl, this.content, this.unreadnum, this.updateTime, this.sessionType, this.listMessageId, this.status, this.id});
+  Session({this.sessionId, this.targetId, this.nickName, this.avatarUrl, this.content, this.unreadnum, this.updateTime, this.sessionType, this.listMessageId, this.status, this.id});
 
   setContent(content) {
     this.content = content;

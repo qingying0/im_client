@@ -1,8 +1,11 @@
+import 'package:chat/db/message_dao.dart';
 import 'package:chat/pages/chat/chat_page.dart';
 import 'package:chat/pages/session/session_chat.dart';
 import 'package:chat/pages/user/person.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/friend.dart';
+import 'package:chat/store/model/message.dart';
+import 'package:chat/store/provider/message_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -58,9 +61,27 @@ class FriendItem extends StatelessWidget {
         ),
       ),
       onPressed: () {
+        var sessionId = Store.value<SessionProvider>(context).getSessionIdByUserId(id);
+        Store.value<MessageProvider>(context).clearBySession(sessionId);
+        Store.value<SessionProvider>(context).clearUnreadSession(sessionId);
+        messageDao.getMessageBySessionId(sessionId).then((listMessage) {
+          listMessage.forEach((item) {
+            Message message = new Message(
+                id: item['id'],
+                sendId: item['send_id'],
+                sessionId: item['session_id'],
+                type: item['type'],
+                createTime: DateTime.fromMicrosecondsSinceEpoch(item['create_time']),
+                content: item['content'],
+                status: item['status'],
+                avatarUrl: item['avatar_url'],
+                username: item['username']
+            );
+            Store.value<MessageProvider>(context).addMessageBySessionId(message);
+          });
+        });
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) {
-              var sessionId = Store.value<SessionProvider>(context).getSessionIdByUserId(id);
               return ChatPage(sessionId, this.username, this.id);
             }
         ));
