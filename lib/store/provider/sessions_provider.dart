@@ -12,25 +12,26 @@ class SessionProvider with ChangeNotifier {
 
   List<Session> _listSession = new List<Session>();
   Map<int ,Session> _mapSession = new Map();
-  bool initdata = false;
 
   List get listSession => _listSession;
   Map get mapSession => _mapSession;
 
   getSessionIdByUserId(int id) {
     for(Session session in _listSession) {
-      if(session.targetId == id) {
+      if(session.targetId == id && session.sessionType == 0) {
         return session.sessionId;
       }
     }
     return null;
   }
 
-  getRandomTime() {
-    int rand = Random().nextInt(1000000000);
-    DateTime now = DateTime.now();
-    DateTime randomDateTime = DateTime.fromMicrosecondsSinceEpoch(now.microsecondsSinceEpoch - rand);
-    return getTime(randomDateTime);
+  getSessionIdByGroupId(int id) {
+    for(Session session in _listSession) {
+      if(session.targetId == id && session.sessionType == 0) {
+        return session.sessionId;
+      }
+    }
+    return null;
   }
 
   getTime(DateTime dateTime) {
@@ -108,10 +109,12 @@ class SessionProvider with ChangeNotifier {
             avatarUrl: null,
             updateTime: getTime(DateTime.parse(session['updateTime'])),
             unreadnum: session.containsKey("unreadNum") ? session['unreadNum'] : null,
+            sessionType: session.containsKey("sessionType") ? session['sessionType'] : null,
           );
           _listSession.add(s);
           _mapSession[s.sessionId] = s;
         }
+
         notifyListeners();
       }
       socketManage.isOnline = true;

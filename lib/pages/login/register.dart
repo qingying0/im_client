@@ -130,7 +130,12 @@ class _RegisterState extends State<Register> {
     var password = _passwordController.text;
     var phone = _phoneController.text;
     Dio dio = new Dio();
-    var response = await dio.post("http://" + GlobalConfig.address + "/register?username=$username&password=$password&phone=$phone");
+    FormData formData = new FormData.from({
+      "username": username,
+      "password": password,
+      "phone": phone
+    });
+    var response = await dio.post("http://" + GlobalConfig.address + "/register", data: formData);
     if(response.data['code'] == 200) {
       Toast.toast(context, msg: "注册成功，请登录");
       Navigator.of(context).pop();

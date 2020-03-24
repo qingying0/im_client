@@ -1,4 +1,5 @@
 import 'package:chat/store/provider/friends_provider.dart';
+import 'package:chat/store/provider/group_provider.dart';
 import 'package:chat/store/provider/message_provider.dart';
 import 'package:chat/store/provider/request_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
@@ -22,6 +23,7 @@ class Store {
         ChangeNotifierProvider(builder: (_)=>MessageProvider(),),
         ChangeNotifierProvider(builder: (_)=>RequestProvider(),),
         ChangeNotifierProvider(builder: (_)=>VoiceRecordProvider(),),
+        ChangeNotifierProvider(builder: (_)=>GroupProvider(),),
       ],
       child: child,
     );

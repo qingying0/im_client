@@ -15,7 +15,6 @@ import 'dart:io';
 
 class ChatPage extends StatefulWidget {
   ChatPage(int sessionId, String nickName, int userId) {
-    print("init chat page");
     this.sessionId = sessionId;
     this.nickName = nickName;
     this.userId = userId;

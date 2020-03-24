@@ -5,6 +5,7 @@ import 'package:chat/store/index.dart';
 import 'package:chat/store/model/friend.dart';
 import 'package:chat/store/model/message.dart';
 import 'package:chat/store/provider/friends_provider.dart';
+import 'package:chat/store/provider/group_provider.dart';
 import 'package:chat/store/provider/message_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,14 @@ class SessionChat extends ListTile {
       child: Store.connect<SessionProvider>(
         builder: (context, snapshot, child) {
           int id = snapshot.getSession(this.sessionId).targetId;
-          Friend f = Store.value<FriendsProvider>(context).getFriend(id);
+          String avatarUrl;
+          if(snapshot.getSession(this.sessionId).sessionType == 0) {
+            avatarUrl = Store.value<FriendsProvider>(context).getFriend(id).avatarUrl;
+          } else if (snapshot.getSession(this.sessionId).sessionType == 1) {
+            print("id = " + id.toString());
+            avatarUrl = Store.value<GroupProvider>(context).getGroup(id).avatarUrl;
+          }
+
           return FlatButton(
             child: new Container(
               height: 80,
@@ -33,7 +41,7 @@ class SessionChat extends ListTile {
                 children: <Widget>[
                   new Container(
                     child:  ClipOval(
-                      child: Image.network(f.avatarUrl, fit: BoxFit.fill, height: 45,),
+                      child: Image.network(avatarUrl, fit: BoxFit.fill, height: 45,),
                     ),
                     height: 60,
                     width: 60,

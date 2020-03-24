@@ -1,19 +1,16 @@
 import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/pages/account/friend_list.dart';
 import 'package:chat/pages/account/group_list.dart';
-import 'package:chat/pages/user/request_handler.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/Request.dart';
-import 'package:chat/store/provider/friends_provider.dart';
 import 'package:chat/store/provider/request_provider.dart';
 import 'package:chat/utils/http_utils.dart';
-import 'package:chat/utils/shared_utils.dart';
 import 'package:chat/utils/toast.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'add_friend.dart';
-import 'friend_item.dart';
+import 'add_group.dart';
 
 class ContactsList extends StatefulWidget {
 
@@ -25,10 +22,8 @@ class ContactsList extends StatefulWidget {
 
 class _ContactsList extends State<ContactsList> {
 
-
   @override
   Widget build(BuildContext context) {
-
     return new DefaultTabController(
         length: 2,
         child: Scaffold(
@@ -42,17 +37,32 @@ class _ContactsList extends State<ContactsList> {
             ),
             centerTitle: true,
             actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  getRequest();
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) {
-                        return new RequestHandler();
-                      }
-                  ));
+              new PopupMenuButton(
+                onSelected: (String value){
+                    print(value);
+                    if(value == "1") {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) {
+                            return AddGroup();
+                          }
+                      ));
+                    }
                 },
-              ),
+                itemBuilder: (BuildContext context) =><PopupMenuItem<String>>[
+                  new PopupMenuItem(
+                      value:"1",
+                      child: new Text("创建群组")
+                  ),
+                  new PopupMenuItem(
+                      value: "2",
+                      child: new Text("添加好友")
+                  ),
+                  new PopupMenuItem(
+                      value: "3",
+                      child: new Text("好友请求")
+                  ),
+                ]
+              )
             ],
           ),
           body: TabBarView(

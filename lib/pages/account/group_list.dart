@@ -1,39 +1,29 @@
 import 'package:chat/pages/account/group_item.dart';
-import 'package:chat/pages/session/session_chat.dart';
+import 'package:chat/store/index.dart';
+import 'package:chat/store/provider/group_provider.dart';
 import 'package:flutter/material.dart';
 
-import 'friend_item.dart';
 
+class GroupList extends StatelessWidget {
 
-class GroupList extends StatefulWidget {
-
-  @override
-  State createState() {
-    return new _GroupList();
-  }
-}
-
-class _GroupList extends State<GroupList> {
-  final List<GroupItem> _groups = <GroupItem>[
-    new GroupItem(groupname: "ccc", avatarUrl: null, description: "bbb",),
-    new GroupItem(groupname: "ccc", avatarUrl: null, description: "bbb",),
-    new GroupItem(groupname: "ccc", avatarUrl: null, description: "bbb",),
-    new GroupItem(groupname: "ccc", avatarUrl: null, description: "bbb",),
-
-  ];
 
   @override
   Widget build(BuildContext context) {
-    return new Column(
-      children: <Widget>[
-        Flexible(
-          child: ListView.builder(
-            padding: EdgeInsets.only(top: 10),
-            itemBuilder: (_, int index)=> _groups[index],
-            itemCount: _groups.length,
-          ),
-        ),
-      ],
-    );
+    return Store.connect<GroupProvider>(
+        builder: (context, snapshot, child) {
+          return new Column(
+            children: <Widget>[
+              Flexible(
+                child: ListView.builder(
+                    padding: EdgeInsets.only(top: 10),
+                    itemBuilder: (BuildContext context, int index) {
+                      return GroupItem(snapshot.getGroups()[index]);
+                    },
+                    itemCount: snapshot.getGroups().length
+                ),
+              ),
+            ],
+          );
+        });
   }
 }

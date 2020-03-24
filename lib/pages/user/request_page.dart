@@ -61,7 +61,6 @@ class _RequestPage extends State<RequestPage> {
                     ),
                     margin: const EdgeInsets.all(16.0),
                   ),
-
                 ],
               ),
             )
@@ -76,7 +75,7 @@ class _RequestPage extends State<RequestPage> {
     var content = _contentTextController.text;
     var response = await dio.post(
       GlobalConfig.baseUrl + "/request?targetId=$userId&content=$content",
-      // options: HttpUtils.getOption(context) 
+      // options: HttpUtils.getOption(context)
       );
     if(response.data['code'] == 200) {
       Toast.toast(context, msg: "添加好于请求已发送:");

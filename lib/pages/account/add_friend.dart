@@ -9,7 +9,6 @@ import 'package:dio/dio.dart';
 
 class AddFriend extends StatefulWidget {
 
-
   @override
   State createState() {
     return new _AddFriend();

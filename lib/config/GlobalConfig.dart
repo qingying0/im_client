@@ -10,6 +10,7 @@ class GlobalConfig {
   static String wsPath = "ws://" + ip + ":" + wsport + "/ws";
   static bool initFriend = false;
   static bool initSession = false;
+  static bool initGroup = false;
 
   static setInitFriend() {
     initFriend = false;
@@ -17,5 +18,9 @@ class GlobalConfig {
 
   static setInitSession() {
     initSession = false;
+  }
+
+  static setInitGroup() {
+    initGroup = false;
   }
 }

@@ -1,8 +1,10 @@
 import 'package:chat/config/GlobalConfig.dart';
+import 'package:chat/pages/account/add_group.dart';
 import 'package:chat/pages/home/mainhome.dart';
 import 'package:chat/pages/login/login.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/provider/friends_provider.dart';
+import 'package:chat/store/provider/group_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/utils/shared_utils.dart';
 
@@ -30,6 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     GlobalConfig.setInitFriend();
     GlobalConfig.setInitSession();
+    GlobalConfig.setInitGroup();
     return Store.init(
       context: context,
       child: MaterialApp(
@@ -37,7 +40,7 @@ class MyApp extends StatelessWidget {
         home: Builder(
           builder: (context) {
             Store.widgetCtx = context;
-            return Login();
+            return  Login();
           }
         ),
       )
@@ -54,14 +57,15 @@ class MyHome extends StatelessWidget {
   Widget build(BuildContext context) {
     GlobalConfig.setInitFriend();
     GlobalConfig.setInitSession();
+    GlobalConfig.setInitGroup();
     return  Store.init(
       context: context,
       child: MaterialApp(
         title: "aqachat",
         home: Builder(
             builder: (context) {
-              Store.value<FriendsProvider>(context).init();
               Store.widgetCtx = context;
+//              return AddGroup();
               return MainHome();
             }
         ),

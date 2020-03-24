@@ -134,7 +134,7 @@ class _Login extends State<Login> {
       Store.value<UserInfoProvider>(context).init();
       GlobalConfig.setInitFriend();
       GlobalConfig.setInitSession();
-
+      GlobalConfig.setInitGroup();
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) {
           return MainHome();

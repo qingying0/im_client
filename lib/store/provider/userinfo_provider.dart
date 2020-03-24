@@ -1,7 +1,6 @@
 import 'package:chat/store/model/user_info.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:chat/utils/shared_utils.dart';
-import 'package:chat/config/GlobalConfig.dart';
 
 class UserInfoProvider with ChangeNotifier {
   UserInfo _userInfo = UserInfo();

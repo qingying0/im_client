@@ -3,6 +3,7 @@ import 'package:chat/pages/session/session_chat_list.dart';
 import 'package:chat/socket/socket_manager.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/provider/friends_provider.dart';
+import 'package:chat/store/provider/group_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +26,7 @@ class _MainHome extends State<MainHome> {
   @override
   Widget build(BuildContext context) {
     Store.value<FriendsProvider>(context).init();
+    Store.value<GroupProvider>(context).init();
     Store.value<SessionProvider>(context).init();
     socketManage.setContext(context);
     socketManage.isOnline = true;
