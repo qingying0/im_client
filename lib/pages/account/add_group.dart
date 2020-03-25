@@ -79,6 +79,7 @@ class _AddGroup extends State<AddGroup> {
           });
           dio.post(GlobalConfig.baseUrl + "/group/add", data: formData);
         }
+        Navigator.pop(context);
     }
   }
 

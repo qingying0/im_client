@@ -1,39 +1,16 @@
-import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/message.dart';
-import 'package:chat/store/model/user_info.dart';
-import 'package:chat/store/provider/friends_provider.dart';
-import 'package:chat/store/provider/message_provider.dart';
-import 'package:chat/store/provider/user_provider.dart';
 import 'package:chat/store/provider/userinfo_provider.dart';
 import 'package:chat/store/provider/voice_record_provider.dart';
 import 'package:flutter/material.dart';
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage(Message message) {
-    this.messageId = message.id;
-    this.sendId = message.sendId;
-    this.sessionId = message.sessionId;
-    this.type = message.type;
-    this.createTime = message.createTime;
-    this.content = message.content;
-    this.status = message.status;
-    this.username = message.username;
-    this.avatarUrl = message.avatarUrl;
-  }
-  int messageId;
-  int sendId;
-  int sessionId;
-  int type;
-  DateTime createTime;
-  String content;
-  String username;
-  String avatarUrl;
-  int status;
+  ChatMessage({this.message}) ;
+  Message message;
   @override
   Widget build(BuildContext context) {
     UserInfoProvider userInfoProvider = Store.value<UserInfoProvider>(context);
-    return userInfoProvider.id == this.sendId ?
+    return userInfoProvider.id == message.sendId ?
     getLeftContainer(context) : getRightContainer(context);
   }
 
@@ -47,7 +24,7 @@ class ChatMessage extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(right: 10, top: 10),
             child: ClipOval(
-              child: Image.network(avatarUrl, fit: BoxFit.fill, height: MediaQuery.of(context).size.width * 0.1,),
+              child: Image.network(message.avatarUrl, fit: BoxFit.fill, height: MediaQuery.of(context).size.width * 0.1,),
             ),
             width: MediaQuery.of(context).size.width * 0.1,
           ),
@@ -76,7 +53,7 @@ class ChatMessage extends StatelessWidget {
           Container(
           margin: EdgeInsets.only(right: 10, top: 10),
             child: ClipOval(
-              child: Image.network(avatarUrl, fit: BoxFit.fill, height: MediaQuery.of(context).size.width * 0.1,),
+              child: Image.network(message.avatarUrl, fit: BoxFit.fill, height: MediaQuery.of(context).size.width * 0.1,),
             ),
           width: MediaQuery.of(context).size.width * 0.1,
           ),
@@ -86,11 +63,11 @@ class ChatMessage extends StatelessWidget {
   }
 
   Container getContent(context) {
-    if(type == 0) {
+    if(message.type == 0) {
       return new Container(
         padding: EdgeInsets.all(10),
         color: Colors.white,
-        child: new Text(content),
+        child: new Text(message.content),
         constraints: BoxConstraints(
           maxWidth: MediaQuery
               .of(context)
@@ -98,15 +75,15 @@ class ChatMessage extends StatelessWidget {
               .width * 0.6,
         ),
       );
-    } else if (type == 1) {
+    } else if (message.type == 1) {
 
-    } else if(type == 2) {
+    } else if(message.type == 2) {
       return new Container(
         padding: EdgeInsets.all(10),
         color: Colors.white,
         child: new GestureDetector(
           onTap: () {
-            Store.value<VoiceRecordProvider>(context).playVoice(content);
+            Store.value<VoiceRecordProvider>(context).playVoice(message.content);
           },
           child: new Text("点击播放"),
         ),

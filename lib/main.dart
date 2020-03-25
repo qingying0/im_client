@@ -65,7 +65,6 @@ class MyHome extends StatelessWidget {
         home: Builder(
             builder: (context) {
               Store.widgetCtx = context;
-//              return AddGroup();
               return MainHome();
             }
         ),

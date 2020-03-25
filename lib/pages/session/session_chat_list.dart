@@ -132,7 +132,7 @@ class _SessionChatList extends State<SessionChatList> {
                   padding: EdgeInsets.only(top: 10),
                   itemBuilder: (BuildContext context, int index) {
                     List<Session> listSession = snapshot.listSession;
-                    return SessionChat(listSession[index].sessionId);
+                    return SessionChat(listSession[index]);
                   },
                   itemCount: snapshot.listSession.length,
                 ),

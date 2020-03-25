@@ -1,15 +1,52 @@
+import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/pages/user/request_page.dart';
+import 'package:chat/store/model/user_info.dart';
+import 'package:chat/utils/shared_utils.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-class Personal extends StatelessWidget {
+class Personal extends StatefulWidget {
+  Personal({this.userInfo});
+  UserInfo userInfo;
 
-  Personal({@required this.userId, @required this.username, @required this.avatarUrl, @required this.description, @required this.friend});
-  final int userId;
-  final String avatarUrl;
-  final String username;
-  final String description;
-  final bool friend;
+  @override
+  State createState() {
+    return _Personal(userInfo: userInfo);
+  }
+
+}
+
+class _Personal extends State<Personal> {
+
+  _Personal({this.userInfo});
+  UserInfo userInfo;
+  bool friend = false;
   BuildContext context;
+
+
+  @override
+  void initState() {
+    userInfo.description = userInfo.description != null ? userInfo.description : " ";
+    initFriend();
+  }
+
+  void initFriend() async{
+    Dio dio = new Dio();
+    dio.options = new Options(
+        headers : {
+    "token": await sharedGetData("token"),
+    });
+    int id = userInfo.id;
+    var response = await dio.get(GlobalConfig.baseUrl + "/friend/isFriend?userId=$id");
+    if(response.data['code'] == 200) {
+      print(response.data['data']);
+      setState(() {
+        friend = response.data['data'];
+      });
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     this.context = context;
@@ -31,9 +68,7 @@ class Personal extends StatelessWidget {
                   children: <Widget>[
                     new Container(
                       margin: EdgeInsets.only(left: 12.0, right: 15.0),
-                      child: avatarUrl == null ?
-                        Image.asset("images/2.jpg")   :
-                        Image.network(avatarUrl),
+                      child: Image.network(userInfo.avatarUrl),
                       width: 70,
                       height: 70,
                     ),
@@ -42,8 +77,8 @@ class Personal extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          new Text("用户名：" + username, style: TextStyle(fontSize: 20),),
-                          new Text("签名:" + username),
+                          new Text("用户名：" + userInfo.username, style: TextStyle(fontSize: 20),),
+                          new Text("签名:" + userInfo.description),
                         ],
                       ),
                     )
@@ -62,9 +97,8 @@ class Personal extends StatelessWidget {
   isfriend() {
     return new FlatButton(
           child: new Container(
-            margin: EdgeInsets.only(top: 30),
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: 40,
+            margin: EdgeInsets.only(top: 30, left: 40, right: 40),
+            height: 60,
             decoration: new BoxDecoration(
                 color: Colors.blue
             ),
@@ -82,9 +116,8 @@ class Personal extends StatelessWidget {
   notFriend() {
     return new FlatButton(
           child: new Container(
-            margin: EdgeInsets.only(top: 30),
-            width: MediaQuery.of(context).size.width * 0.8,
-            height: 40,
+            margin: EdgeInsets.only(top: 30, left: 40, right: 40),
+            height: 60,
             decoration: new BoxDecoration(
                 color: Colors.blue
             ),
@@ -97,7 +130,7 @@ class Personal extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) {
-                  return RequestPage(userId: userId);
+                  return RequestPage(userId: userInfo.id);
                 }
             ));
           },

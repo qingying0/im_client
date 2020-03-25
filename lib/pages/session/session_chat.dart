@@ -4,6 +4,7 @@ import 'package:chat/pages/chat/chat_page.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/friend.dart';
 import 'package:chat/store/model/message.dart';
+import 'package:chat/store/model/session.dart';
 import 'package:chat/store/provider/friends_provider.dart';
 import 'package:chat/store/provider/group_provider.dart';
 import 'package:chat/store/provider/message_provider.dart';
@@ -11,29 +12,25 @@ import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:flutter/material.dart';
 
 class SessionChat extends ListTile {
-  SessionChat(int  sessionId) {
-    this.sessionId = sessionId;
+  SessionChat(Session session) {
+    this.session = session;
   }
-  int sessionId;
+  Session session;
   @override
   Widget build(BuildContext context) {
+    int id = session.targetId;
+    String avatarUrl;
+    if(session.sessionType == 0) {
+      avatarUrl = Store.value<FriendsProvider>(context).getFriend(id).avatarUrl;
+    } else if (session.sessionType == 1) {
+      avatarUrl = Store.value<GroupProvider>(context).getGroup(id).avatarUrl;
+    }
     return new Container(
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12))
       ),
-      child: Store.connect<SessionProvider>(
-        builder: (context, snapshot, child) {
-          int id = snapshot.getSession(this.sessionId).targetId;
-          String avatarUrl;
-          if(snapshot.getSession(this.sessionId).sessionType == 0) {
-            avatarUrl = Store.value<FriendsProvider>(context).getFriend(id).avatarUrl;
-          } else if (snapshot.getSession(this.sessionId).sessionType == 1) {
-            print("id = " + id.toString());
-            avatarUrl = Store.value<GroupProvider>(context).getGroup(id).avatarUrl;
-          }
-
-          return FlatButton(
+      child: new FlatButton(
             child: new Container(
               height: 80,
               child: new Row(
@@ -53,11 +50,11 @@ class SessionChat extends ListTile {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         new Container(
-                          child: Text(snapshot.getSession(this.sessionId).nickName, style: TextStyle(fontSize: 20, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
+                          child: Text(session.nickName, style: TextStyle(fontSize: 20, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                         Container(
                           width: MediaQuery.of(context).size.width * 0.8,
-                          child: new Text(snapshot.getSession(this.sessionId).content, style: TextStyle(fontSize: 16, color: Color(0xFFa9a9a9)), maxLines: 1, overflow: TextOverflow.ellipsis,),
+                          child: new Text(session.content, style: TextStyle(fontSize: 16, color: Color(0xFFa9a9a9)), maxLines: 1, overflow: TextOverflow.ellipsis,),
                         )
                       ],
                     ),
@@ -69,14 +66,13 @@ class SessionChat extends ListTile {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         new Container(
-                          child: Text(snapshot.getSession(this.sessionId).updateTime, style: TextStyle(fontSize: 16, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
+                          child: Text(session.updateTime, style: TextStyle(fontSize: 16, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
-
                         Container(
                           width: 20,
                           child: new CircleAvatar(
-                            backgroundColor: snapshot.getSession(this.sessionId).unreadnum == 0 ? Colors.white :  Colors.red,
-                            child: new Text(snapshot.getSession(this.sessionId).unreadnum.toString(), style: TextStyle(color: Colors.white),),
+                            backgroundColor: session.unreadnum == 0 ? Colors.white :  Colors.red,
+                            child: new Text(session.unreadnum.toString(), style: TextStyle(color: Colors.white),),
                             radius: 10,),
                         )
                       ],
@@ -86,9 +82,9 @@ class SessionChat extends ListTile {
               ),
             ),
             onPressed: () {
-              Store.value<MessageProvider>(context).clearBySession(sessionId);
-              Store.value<SessionProvider>(context).clearUnreadSession(sessionId);
-              messageDao.getMessageBySessionId(sessionId).then((listMessage) {
+              Store.value<MessageProvider>(context).clearBySession(session.sessionId);
+              Store.value<SessionProvider>(context).clearUnreadSession(session.sessionId);
+              messageDao.getMessageBySessionId(session.sessionId).then((listMessage) {
                 listMessage.forEach((item) {
                   Message message = new Message(
                     id: item['id'],
@@ -106,13 +102,12 @@ class SessionChat extends ListTile {
               });
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) {
-                    return ChatPage(snapshot.getSession(this.sessionId).sessionId, snapshot.getSession(this.sessionId).nickName, snapshot.getSession(this.sessionId).targetId);
+                    print("to chat page session = " + session.toString());
+                    return ChatPage(session: session);
                   }
               ));
             },
-          ) ;
-        }
-      ) ,
+          )
     );
   }
 

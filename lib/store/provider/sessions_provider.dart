@@ -11,24 +11,31 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 class SessionProvider with ChangeNotifier {
 
   List<Session> _listSession = new List<Session>();
-  Map<int ,Session> _mapSession = new Map();
 
-  List get listSession => _listSession;
-  Map get mapSession => _mapSession;
+  get listSession => _listSession;
 
-  getSessionIdByUserId(int id) {
+  getSessionByUserId(int id) {
     for(Session session in _listSession) {
       if(session.targetId == id && session.sessionType == 0) {
-        return session.sessionId;
+        return session;
       }
     }
     return null;
   }
 
-  getSessionIdByGroupId(int id) {
+  getSessionByGroupId(int id) {
     for(Session session in _listSession) {
-      if(session.targetId == id && session.sessionType == 0) {
-        return session.sessionId;
+      if(session.targetId == id && session.sessionType == 1) {
+        return session;
+      }
+    }
+    return null;
+  }
+
+  getSessionBySessionId(int id) {
+    for(Session session in _listSession) {
+      if(session.sessionId == id) {
+        return session;
       }
     }
     return null;
@@ -48,49 +55,42 @@ class SessionProvider with ChangeNotifier {
     }
   }
 
-  getSession(int session) {
-    return _mapSession[session];
-  }
-
-  getMessage(int session) {
-    return _mapSession[session].listMessageId;
-  }
-
-  addMessage(int session, int messageId) {
-    _mapSession[session].listMessageId.add(messageId);
-    notifyListeners();
-  }
-
   updateByReceivedMessage(Message message) {
-    _mapSession[message.sessionId].unreadnum++;
-    if(message.type == 0) {
-      _mapSession[message.sessionId].content = message.content;
-    } else if(message.type == 2) {
-      _mapSession[message.sessionId].content = "语音";
+    for(Session session in _listSession) {
+      if(session.sessionId == message.sessionId) {
+        session.unreadnum++;
+        if(message.type == 0) {
+          session.content = message.content;
+        } else if(message.type == 2) {
+          session.content = "语音";
+        }
+        session.updateTime = getTime(DateTime.now());
+      }
     }
-    _mapSession[message.sessionId].updateTime = getTime(DateTime.now());
     notifyListeners();
   }
 
   updateContent(Message message) {
-    if(message.type == 0) {
-      _mapSession[message.sessionId].content = message.content;
-    } else if(message.type == 2) {
-      _mapSession[message.sessionId].content = "语音";
+    for(Session session in _listSession) {
+      if(session.sessionId == message.sessionId) {
+        if(message.type == 0) {
+          session.content = message.content;
+        } else if(message.type == 2) {
+          session.content = "语音";
+        }
+      }
     }
     notifyListeners();
   }
 
   clear() {
     _listSession.clear();
-    _mapSession.clear();
   }
 
   init() async{
     if(GlobalConfig.initSession == false) {
       GlobalConfig.initSession = true;
       _listSession.clear();
-      _mapSession.clear();
       Dio dio = new Dio();
       dio.options = new Options(
         headers : {
@@ -112,7 +112,7 @@ class SessionProvider with ChangeNotifier {
             sessionType: session.containsKey("sessionType") ? session['sessionType'] : null,
           );
           _listSession.add(s);
-          _mapSession[s.sessionId] = s;
+//          _mapSession[s.sessionId] = s;
         }
 
         notifyListeners();
@@ -123,7 +123,12 @@ class SessionProvider with ChangeNotifier {
   }
 
   clearUnreadSession(int sessionId) {
-    _mapSession[sessionId].unreadnum = 0;
+    for(Session session in _listSession) {
+      if(session.sessionId == sessionId) {
+        session.unreadnum = 0;
+      }
+    }
+//    _mapSession[sessionId].unreadnum = 0;
   }
 
 }

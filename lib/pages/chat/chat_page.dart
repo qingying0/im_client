@@ -3,6 +3,7 @@ import 'package:chat/db/message_dao.dart';
 import 'package:chat/socket/socket_manager.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/message.dart';
+import 'package:chat/store/model/session.dart';
 import 'package:chat/store/provider/message_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:chat/store/provider/userinfo_provider.dart';
@@ -14,22 +15,20 @@ import 'chat_message.dart';
 import 'dart:io';
 
 class ChatPage extends StatefulWidget {
-  ChatPage(int sessionId, String nickName, int userId) {
-    this.sessionId = sessionId;
-    this.nickName = nickName;
-    this.userId = userId;
-  }
-  int sessionId;
-  String nickName;
-  int userId;
+  ChatPage({this.session}) ;
+  Session session;
 
   @override
   State createState() {
-    return _ChatPageState();
+    print("session = " + session.toString());
+    return _ChatPageState(session: session);
   }
 }
 
 class _ChatPageState extends State<ChatPage>{
+
+  _ChatPageState({this.session});
+  Session session;
 
   final TextEditingController _textController = TextEditingController();
   bool _isComposing = false;
@@ -43,8 +42,16 @@ class _ChatPageState extends State<ChatPage>{
       builder: (context, snapshot, child) {
         return new Scaffold(
             appBar: AppBar(
-              title: Text(widget.nickName),
+              title: Text(session.nickName),
               centerTitle: true,
+              actions: <Widget>[
+                IconButton(
+                    icon: Icon(Icons.more),
+                    onPressed: () {
+                      toInfo();
+                    }
+                ),
+              ],
             ),
             body: Container(
               color: Colors.white10,
@@ -56,9 +63,9 @@ class _ChatPageState extends State<ChatPage>{
                       reverse: true,
                       itemBuilder: (BuildContext context, int index) {
 //                        print("message in chatpage = " + snapshot.getMessageBySessionId(widget.sessionId)[index].toString());
-                        return ChatMessage(snapshot.getMessageBySessionId(widget.sessionId)[index]);
+                        return ChatMessage(message: snapshot.getMessageBySessionId(session.sessionId)[index]);
                       },
-                      itemCount: snapshot.getMessageBySessionId(widget.sessionId).length,
+                      itemCount: snapshot.getMessageBySessionId(session.sessionId).length,
                     ),
                   ),
                 ],
@@ -75,7 +82,6 @@ class _ChatPageState extends State<ChatPage>{
     );
   }
 
-
   void _handleSubmitted(String text) async{
     _textController.clear();
     UserInfoProvider userInfoProvider = Store.value<UserInfoProvider>(context);
@@ -85,12 +91,19 @@ class _ChatPageState extends State<ChatPage>{
     "token": await sharedGetData("token"),
     });
     FormData formData = FormData.from({
-      "sessionId": widget.sessionId,
+      "sessionId": session.sessionId,
       "type": 0,
       "content": text,
-      "targetId": widget.userId
+      "targetId": session.targetId
     });
-    var response = await dio.post(GlobalConfig.baseUrl + "/message", data: formData);
+    var response;
+    if(session.sessionType == 0) {
+      response = await dio.post(GlobalConfig.baseUrl + "/message", data: formData);
+    } else if(session.sessionType == 1) {
+      response = await dio.post(GlobalConfig.baseUrl + "/message/groupMessage", data: formData);
+    } else {
+      return;
+    }
     var data = response.data['data'];
     print("data = " + data.toString());
     if(response.data['code'] == 200) {
@@ -98,7 +111,7 @@ class _ChatPageState extends State<ChatPage>{
         id: data['id'],
         sendId: data['sendId'],
         sessionId: data['sessionId'],
-        targetId: widget.userId,
+        targetId: session.targetId,
         type: data['type'],
         createTime: DateTime.parse(data['createTime']),
         content: data['content'],
@@ -127,8 +140,8 @@ class _ChatPageState extends State<ChatPage>{
         new Future.delayed(const Duration(seconds: 1));
         Message message = new Message(
             sendId: Store.value<UserInfoProvider>(context).id,
-            sessionId: widget.sessionId,
-            targetId: widget.userId,
+            sessionId: session.sessionId,
+            targetId: session.targetId,
             createTime: DateTime.now(),
             type: 2,
             status: 0,
@@ -175,6 +188,15 @@ class _ChatPageState extends State<ChatPage>{
                       icon: new Icon(Icons.send),
                             onPressed: _isComposing ?  () => _handleSubmitted(_textController.text) : null,
                     ),
+                  ),
+                  new Container(
+                    margin: new EdgeInsets.symmetric(horizontal: 4.0),
+                    child: new IconButton(
+                      icon: new Icon(Icons.image),
+                      onPressed: () {
+
+                      }
+                    ),
                   )
                 ]
             )
@@ -198,6 +220,10 @@ class _ChatPageState extends State<ChatPage>{
         decoration: new InputDecoration.collapsed(hintText: '发送消息'),
       );
     }
+  }
+
+  void toInfo() {
+
   }
 }
 

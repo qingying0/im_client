@@ -9,7 +9,6 @@ import 'package:chat/store/provider/message_provider.dart';
 import 'package:chat/store/provider/sessions_provider.dart';
 import 'package:flutter/material.dart';
 
-
 class FriendList extends StatelessWidget {
 
   @override
@@ -72,8 +71,8 @@ class FriendItem extends StatelessWidget {
                 ),
                 new Row(
                   children: <Widget>[
-                    this.status == 0 ? new Text( "[在线]", style: TextStyle(fontSize: 14, color: Colors.blueAccent), maxLines: 1, overflow: TextOverflow.ellipsis,)
-                        : new Text( "[离线]", style: TextStyle(fontSize: 14, color: Color(0xFFa9a9a9)), maxLines: 1, overflow: TextOverflow.ellipsis,),
+//                    this.status == 0 ? new Text( "[在线]", style: TextStyle(fontSize: 14, color: Colors.blueAccent), maxLines: 1, overflow: TextOverflow.ellipsis,)
+//                        : new Text( "[离线]", style: TextStyle(fontSize: 14, color: Color(0xFFa9a9a9)), maxLines: 1, overflow: TextOverflow.ellipsis,),
                     Container(
                       width: MediaQuery.of(context).size.width * 0.7,
                       child: new Text( this.description == null ? "" : description, style: TextStyle(fontSize: 14, color: Color(0xFFa9a9a9)), maxLines: 1, overflow: TextOverflow.ellipsis,),
@@ -86,10 +85,10 @@ class FriendItem extends StatelessWidget {
         ),
       ),
       onPressed: () {
-        var sessionId = Store.value<SessionProvider>(context).getSessionIdByUserId(id);
-        Store.value<MessageProvider>(context).clearBySession(sessionId);
-        Store.value<SessionProvider>(context).clearUnreadSession(sessionId);
-        messageDao.getMessageBySessionId(sessionId).then((listMessage) {
+        Session session = Store.value<SessionProvider>(context).getSessionByUserId(id);
+        Store.value<MessageProvider>(context).clearBySession(session.sessionId);
+        Store.value<SessionProvider>(context).clearUnreadSession(session.sessionId);
+        messageDao.getMessageBySessionId(session.sessionId).then((listMessage) {
           listMessage.forEach((item) {
             Message message = new Message(
                 id: item['id'],
@@ -107,7 +106,7 @@ class FriendItem extends StatelessWidget {
         });
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) {
-              return ChatPage(sessionId, this.username, this.id);
+              return ChatPage(session: session);
             }
         ));
       },

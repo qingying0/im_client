@@ -1,12 +1,6 @@
-import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/pages/account/friend_list.dart';
 import 'package:chat/pages/account/group_list.dart';
-import 'package:chat/store/index.dart';
-import 'package:chat/store/model/Request.dart';
-import 'package:chat/store/provider/request_provider.dart';
-import 'package:chat/utils/http_utils.dart';
-import 'package:chat/utils/toast.dart';
-import 'package:dio/dio.dart';
+import 'package:chat/pages/user/request_handler.dart';
 import 'package:flutter/material.dart';
 
 import 'add_friend.dart';
@@ -43,7 +37,16 @@ class _ContactsList extends State<ContactsList> {
                     if(value == "1") {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) {
-                            return AddGroup();
+                            return new AddGroup();
+                          }
+                      ));
+                    } else if(value == "2") {
+                      print("true");
+                      showSearch(context: context, delegate: new AddFriend());
+                    } else if(value == "3") {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) {
+                            return new RequestHandler();
                           }
                       ));
                     }
@@ -71,40 +74,8 @@ class _ContactsList extends State<ContactsList> {
               new GroupList()
             ],
           ),
-          floatingActionButton: new FloatingActionButton(
-            onPressed: () {
-              showDialog<Null>(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return AddFriend();
-              },
-              ).then((val) {
-
-              });
-            },
-            child: new Icon(Icons.group_add),
-          ),
         )
     );
-  }
-
-  getRequest() async{
-    Dio dio = new Dio();
-    dio.options = HttpUtils.getOption(context);
-    var response = await dio.get(
-      GlobalConfig.baseUrl + "/request",
-      );
-    if(response.data['code'] == 200) {
-      var listRequest = response.data['data'];
-      Store.value<RequestProvider>(context).clear();
-      for (var request in listRequest) {
-        Store.value<RequestProvider>(context).addRequest(new Request(id: request['id'], username: request['username'], content: request['content'], type: request['type'], status: request['status'], avatarUrl: request['avatarUrl']));
-      }
-      //
-    } else {
-      Toast.toast(context, msg: "发生错误:" + response.data['message']);
-    }
   }
 }
 

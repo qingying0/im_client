@@ -21,6 +21,7 @@ class VoiceRecordProvider with ChangeNotifier{
   bool isCancel;
   FlutterPluginRecord recordPlugin;
   Message message;
+  int type;
 
   VoiceRecordProvider() {
     ifTap = false;
@@ -74,7 +75,6 @@ class VoiceRecordProvider with ChangeNotifier{
   }
 
   void sendMessage(Message message, String url) async {
-    print("message = " + message.toString());
     Dio dio = new Dio();
     dio.options = new Options(
         headers : {
@@ -86,7 +86,12 @@ class VoiceRecordProvider with ChangeNotifier{
       "content": url,
       "targetId": message.targetId
     });
-    var response = await dio.post(GlobalConfig.baseUrl + "/message", data: formData);
+    var response;
+    if(this.type == 0) {
+      response = await dio.post(GlobalConfig.baseUrl + "/message", data: formData);
+    } else if(this.type == 1) {
+      response = await dio.post(GlobalConfig.baseUrl + "/message/groupMessage", data: formData);
+    }
     var data = response.data['data'];
     print(data);
     if(response.data['code'] == 200) {
@@ -130,5 +135,9 @@ class VoiceRecordProvider with ChangeNotifier{
 
   void setMessage(Message message) {
     this.message = message;
+  }
+
+  void setSessionType(int type) {
+    this.type = type;
   }
 }

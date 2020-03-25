@@ -15,7 +15,10 @@ class Session {
 
   Session({this.sessionId, this.targetId, this.nickName, this.avatarUrl, this.content, this.unreadnum, this.updateTime, this.sessionType, this.listMessageId, this.status, this.id});
 
-  setContent(content) {
-    this.content = content;
+  @override
+  String toString() {
+    return 'Session{id: $id, targetId: $targetId, sessionId: $sessionId, nickName: $nickName, content: $content, avatarUrl: $avatarUrl, updateTime: $updateTime, unreadnum: $unreadnum, sessionType: $sessionType, listMessageId: $listMessageId, status: $status}';
   }
+
+
 }

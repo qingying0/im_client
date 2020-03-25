@@ -9,9 +9,6 @@ class MessageProvider with ChangeNotifier {
   Map<int, List<Message>> _mapSessionIdMessage = new Map();
 
   Map get mapSessionIdMessage => _mapSessionIdMessage;
-  MessageProvider() {
-    
-  }
 
   clear() {
     _mapSessionIdMessage.clear();

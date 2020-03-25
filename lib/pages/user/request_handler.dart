@@ -2,8 +2,8 @@
 import 'package:chat/config/GlobalConfig.dart';
 import 'package:chat/store/index.dart';
 import 'package:chat/store/model/Request.dart';
-import 'package:chat/store/provider/request_provider.dart';
 import 'package:chat/utils/http_utils.dart';
+import 'package:chat/utils/shared_utils.dart';
 import 'package:chat/utils/toast.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,56 +13,83 @@ class RequestHandler extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
-    return _FriendHandler();
+    return _RequestHandler();
   }
-
 }
 
 
-class _FriendHandler extends State<RequestHandler> {
+class _RequestHandler extends State<RequestHandler> {
+
+  List<Request> listRequest = new List();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initRequest();
+  }
+
+  void initRequest() async{
+    Dio dio = new Dio();
+    dio.options = new Options(
+        headers : {
+    "token": await sharedGetData("token"),
+    });
+    var response = await dio.get(GlobalConfig.baseUrl + "/request");
+    if(response.data['code'] == 200) {
+      List listData = response.data['data'];
+      for(Map map in listData) {
+        print("map = " + map.toString());
+        Request request = new Request(
+          id: map['id'],
+          username: map['username'],
+          content: map['content'],
+          type: map['type'],
+          status: map['status'],
+          avatarUrl: map['avatarUrl'],
+        );
+        listRequest.add(request);
+      }
+      setState(() {
+
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-          appBar: AppBar(
-            title: Text("好友请求"),
-            centerTitle: true,
-          ),
-          body: Store.connect<RequestProvider>(
-            builder: (context, snapshot, child) {
-              return new ListView.builder(
-                padding: EdgeInsets.only(top: 10),
-                itemBuilder: (BuildContext context, int index) {
-                  List<Request> listRequest = snapshot.getRequests();
-                  return RequestItem(listRequest[index]);
-                },
-                itemCount: snapshot.getRequests().length,
-              );
-            }
+      appBar: AppBar(
+        title: Text("好友请求"),
+        centerTitle: true,
+      ),
+      body:new ListView.builder(
+            padding: EdgeInsets.only(top: 10),
+            itemBuilder: (BuildContext context, int index) {
+              return RequestItem(request: listRequest[index]);
+            },
+            itemCount: listRequest.length,
           )
-        );
+    );
   }
 }
 
 
-class RequestItem extends StatelessWidget {
-  RequestItem(Request request) {
-    this.id = request.id;
-    this.username = request.username;
-    this.content = request.content;
-    this.type = request.type;
-    this.status = request.status;
-    this.avatarUrl = request.avatarUrl;
+class RequestItem extends StatefulWidget {
 
+  RequestItem({this.request});
+  Request request;
+
+  @override
+  State createState() {
+    return new _RequestItem(request: request);
   }
-  int id;
-  String username;
-  String content;
-  String avatarUrl;
-  int type;
-  int status;
+}
+
+class _RequestItem extends State<RequestItem> {
+  _RequestItem({this.request});
+  Request request;
   BuildContext context;
   @override
   Widget build(BuildContext context) {
@@ -75,8 +102,7 @@ class RequestItem extends StatelessWidget {
         children: <Widget>[
           new Container(
             child: ClipOval(
-              child: avatarUrl == null ?
-              Image.asset("images/2.jpg", fit: BoxFit.fill, height: 45,) : Image.network(avatarUrl, fit: BoxFit.fill, height: 45,),
+              child: Image.network(request.avatarUrl, fit: BoxFit.fill, height: 45,),
             ),
             height: 45,
             width: 45,
@@ -88,18 +114,18 @@ class RequestItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 new Container(
-                  child: Text(username, style: TextStyle(fontSize: 20, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
+                  child: Text(request.username, style: TextStyle(fontSize: 20, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.6,
-                  child: new Text(content, style: TextStyle(fontSize: 16, color: Color(0xFFa9a9a9)), maxLines: 1, overflow: TextOverflow.ellipsis,),
+                  child: new Text(request.content, style: TextStyle(fontSize: 16, color: Color(0xFFa9a9a9)), maxLines: 1, overflow: TextOverflow.ellipsis,),
                 )
               ],
             ),
           ),
           new Container(
             width: MediaQuery.of(context).size.width * 0.5,
-            child: status == 0 ? new Row(
+            child: request.status == 0 ? new Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 new FlatButton(
@@ -128,7 +154,7 @@ class RequestItem extends StatelessWidget {
               children: <Widget>[
                 new Container(
                   width: MediaQuery.of(context).size.width * 0.25,
-                  child: Text(status == 1 ? "添加成功" : "已经忽略", style: TextStyle(fontSize: 16, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
+                  child: Text(request.status == 1 ? "添加成功" : "已经忽略", style: TextStyle(fontSize: 16, color: Color(0xFF353535)),  maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
               ],
               )
@@ -141,17 +167,18 @@ class RequestItem extends StatelessWidget {
   updateRequest(int status) async {
     Dio dio = new Dio();
     dio.options = HttpUtils.getOption(context);
+    int id = request.id;
     var response = await dio.put(
       GlobalConfig.baseUrl + "/request?requestId=$id&status=$status",
       );
     if(response.data['code'] == 200) {
-      var data = response.data['data'];
-      Store.value<RequestProvider>(context).updateRequest(data['id'], data['status']);
+      print("response = ");
+      print(response);
+      setState(() {
+        this.request.status = status;
+      });
     } else {
       Toast.toast(context, msg: "发生错误:" + response.data['message']);
     }
   }
-
-
-
 }
