@@ -10,6 +10,10 @@ import 'package:flutter/foundation.dart' show ChangeNotifier;
 
 class SessionProvider with ChangeNotifier {
 
+  SessionProvider() {
+    init();
+  }
+
   List<Session> _listSession = new List<Session>();
 
   get listSession => _listSession;
@@ -88,38 +92,35 @@ class SessionProvider with ChangeNotifier {
   }
 
   init() async{
-    if(GlobalConfig.initSession == false) {
-      GlobalConfig.initSession = true;
-      _listSession.clear();
-      Dio dio = new Dio();
-      dio.options = new Options(
-        headers : {
-          "token": await sharedGetData("token"),
-        });
-      var response = await dio.get("http://" + GlobalConfig.address + "/session");
-      if(response.data['code'] == 200) {
-        List sessions = response.data['data'];
-        for (Map session in sessions) {
-          Session s = new Session(
-            id: session.containsKey("id") ? session['id'] : null,
-            sessionId: session.containsKey("sessionId") ? session['sessionId'] : null,
-            targetId: session.containsKey("targetId") ? session['targetId'] : null,
-            nickName: session.containsKey("nickname") ? session['nickname'] : null,
-            content: session.containsKey("content") ? session['content'] : null,
-            avatarUrl: null,
-            updateTime: getTime(DateTime.parse(session['updateTime'])),
-            unreadnum: session.containsKey("unreadNum") ? session['unreadNum'] : null,
-            sessionType: session.containsKey("sessionType") ? session['sessionType'] : null,
-          );
-          _listSession.add(s);
+    _listSession.clear();
+    Dio dio = new Dio();
+    dio.options = new Options(
+      headers : {
+        "token": await sharedGetData("token"),
+      });
+    var response = await dio.get("http://" + GlobalConfig.address + "/session");
+    if(response.data['code'] == 200) {
+      List sessions = response.data['data'];
+      for (Map session in sessions) {
+        Session s = new Session(
+          id: session.containsKey("id") ? session['id'] : null,
+          sessionId: session.containsKey("sessionId") ? session['sessionId'] : null,
+          targetId: session.containsKey("targetId") ? session['targetId'] : null,
+          nickName: session.containsKey("nickname") ? session['nickname'] : null,
+          content: session.containsKey("content") ? session['content'] : null,
+          avatarUrl: null,
+          updateTime: getTime(DateTime.parse(session['updateTime'])),
+          unreadnum: session.containsKey("unreadNum") ? session['unreadNum'] : null,
+          sessionType: session.containsKey("sessionType") ? session['sessionType'] : null,
+        );
+        _listSession.add(s);
 //          _mapSession[s.sessionId] = s;
-        }
-
-        notifyListeners();
       }
-      socketManage.isOnline = true;
-      socketManage.conn();
+
+      notifyListeners();
     }
+    socketManage.isOnline = true;
+    socketManage.conn();
   }
 
   clearUnreadSession(int sessionId) {

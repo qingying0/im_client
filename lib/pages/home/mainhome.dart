@@ -25,34 +25,42 @@ class _MainHome extends State<MainHome> {
 
   @override
   Widget build(BuildContext context) {
-    Store.value<FriendsProvider>(context).init();
-    Store.value<GroupProvider>(context).init();
-    Store.value<SessionProvider>(context).init();
-    socketManage.setContext(context);
     socketManage.isOnline = true;
-    return new Scaffold(
-      bottomNavigationBar: new BottomNavigationBar(
-        items: [
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.message),
-            title: new Text("消息"),
-            backgroundColor: _currentIndex == 0 ? Theme.of(context).primaryColor : Colors.black12,
-          ),
-          new BottomNavigationBarItem(
-            icon: new Icon(Icons.account_box),
-            title: new Text("联系人"),
-            backgroundColor: _currentIndex == 1 ? Theme.of(context).primaryColor : Colors.black12,
-          )
-        ],
-        currentIndex: _currentIndex,
-        onTap: (int index) {
-          _currentIndex = index;
-          setState(() {
-          });
-        },
+    return Store.init(
+      context: context,
+      child: MaterialApp(
+        title: "aqachat",
+        home: Builder(
+            builder: (context) {
+              Store.widgetCtx = context;
+              socketManage.setContext(context);
+              return new Scaffold(
+                bottomNavigationBar: new BottomNavigationBar(
+                  items: [
+                    new BottomNavigationBarItem(
+                      icon: new Icon(Icons.message),
+                      title: new Text("消息"),
+                      backgroundColor: _currentIndex == 0 ? Theme.of(context).primaryColor : Colors.black12,
+                    ),
+                    new BottomNavigationBarItem(
+                      icon: new Icon(Icons.account_box),
+                      title: new Text("联系人"),
+                      backgroundColor: _currentIndex == 1 ? Theme.of(context).primaryColor : Colors.black12,
+                    )
+                  ],
+                  currentIndex: _currentIndex,
+                  onTap: (int index) {
+                    _currentIndex = index;
+                    setState(() {
+                    });
+                  },
 
-      ),
-      body: _pageList[_currentIndex],
+                ),
+                body: _pageList[_currentIndex],
+              );
+            }
+        ),
+      )
     );
   }
 }

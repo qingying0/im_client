@@ -2,7 +2,6 @@
 import 'package:chat/db/message_dao.dart';
 import 'package:chat/pages/chat/chat_page.dart';
 import 'package:chat/store/index.dart';
-import 'package:chat/store/model/friend.dart';
 import 'package:chat/store/model/message.dart';
 import 'package:chat/store/model/session.dart';
 import 'package:chat/store/provider/friends_provider.dart';
@@ -110,5 +109,4 @@ class SessionChat extends ListTile {
           )
     );
   }
-
 }

@@ -15,14 +15,12 @@ import 'package:chat/socket/socket_manager.dart';
 class Login extends StatefulWidget {
   @override
   State createState() => new _Login();
-
 }
-class _Login extends State<Login> {
 
+class _Login extends State<Login> {
 
   TextEditingController _phoneController = new TextEditingController();
   TextEditingController _passwordController = new TextEditingController();
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +55,6 @@ class _Login extends State<Login> {
                                 Icons.phone
                               ),
                             ),
-
                           ),
                           TextField(
                             controller: _passwordController,
@@ -116,7 +113,6 @@ class _Login extends State<Login> {
             ],
           )
         ]));
-
   }
 
   login() async{
@@ -132,9 +128,6 @@ class _Login extends State<Login> {
       sharedAddAndUpdate('token', String, data['token']);
       sharedAddAndUpdate('id', int, data['id']);
       Store.value<UserInfoProvider>(context).init();
-      GlobalConfig.setInitFriend();
-      GlobalConfig.setInitSession();
-      GlobalConfig.setInitGroup();
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) {
           return MainHome();
