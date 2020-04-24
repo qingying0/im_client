@@ -19,110 +19,99 @@ class _RegisterState extends State<Register> {
     return new Scaffold(
         body: new Stack(children: <Widget>[
           new Opacity(
-              opacity: 0.5,
-              child: new Container(
-                decoration: new BoxDecoration(
-                  image: new DecorationImage(
-                    image: NetworkImage("https://i0.hdslb.com/bfs/article/7788807d72c235424f348e3bc20c4c571c7c27bc.jpg@1320w_1844h.webp"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              )),
-          new Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              new BackButton(),
-              new Text("Sign up",
-                textScaleFactor: 2,
-                style: TextStyle(
-                  color: const Color(0xff000000),
+            opacity: 0.5,
+            child: new Container(
+              decoration: new BoxDecoration(
+                image: new DecorationImage(
+                  image: NetworkImage("https://i0.hdslb.com/bfs/article/7788807d72c235424f348e3bc20c4c571c7c27bc.jpg@1320w_1844h.webp"),
+                  fit: BoxFit.cover,
                 ),
               ),
-              new Container(
-                width: MediaQuery.of(context).size.width * 0.96,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      TextField(
-                        controller: _usernameController,
-                        decoration: new InputDecoration(
-                          hintText: 'Username',
-                          icon: new Icon(
-                            Icons.account_circle,
-                          ),
+            )
+          ),
+          new Center(
+            child: new Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextField(
+                      controller: _usernameController,
+                      decoration: new InputDecoration(
+                        hintText: 'Username',
+                        icon: new Icon(
+                          Icons.account_circle,
                         ),
                       ),
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        keyboardType: TextInputType.number,
-                        decoration: new InputDecoration(
-                          hintText: 'Password',
-                          icon: new Icon(
-                            Icons.lock_outline,
-                          ),
+                    ),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      decoration: new InputDecoration(
+                        hintText: 'Password',
+                        icon: new Icon(
+                          Icons.lock_outline,
                         ),
                       ),
-                      TextField(
-                        controller: _phoneController,
-                        obscureText: true,
-                        keyboardType: TextInputType.phone,
-                        decoration: new InputDecoration(
-                          hintText: 'phone',
-                          icon: new Icon(
-                              Icons.phone
-                          ),
+                    ),
+                    TextField(
+                      controller: _phoneController,
+                      obscureText: true,
+                      keyboardType: TextInputType.phone,
+                      decoration: new InputDecoration(
+                        hintText: 'phone',
+                        icon: new Icon(
+                            Icons.phone
                         ),
-                        inputFormatters: <TextInputFormatter>[
-                          WhitelistingTextInputFormatter.digitsOnly
-                        ],
                       ),
-                      new FlatButton(
-                        child: new Container(
-                          margin: EdgeInsets.only(top: 30),
-                          height: 30,
-                          decoration: new BoxDecoration(
-                              color: Colors.blue
-                          ),
-                          child: new Center(
-                              child: new Text("sign up",
-                                  style: new TextStyle(
-                                    color: const Color(0xff000000),
-                                  ))),
+                      inputFormatters: <TextInputFormatter>[
+                        WhitelistingTextInputFormatter.digitsOnly
+                      ],
+                    ),
+                    new FlatButton(
+                      child: new Container(
+                        margin: EdgeInsets.only(top: 30),
+                        height: 30,
+                        decoration: new BoxDecoration(
+                            color: Colors.blue
                         ),
-                        onPressed: () {
-                          if(_usernameController.text.length <= 2) {
-                            Toast.toast(context, msg: "用户名长度太短");
+                        child: new Center(
+                            child: new Text("sign up",
+                                style: new TextStyle(
+                                  color: const Color(0xff000000),
+                                ))),
+                      ),
+                      onPressed: () {
+                        if(_usernameController.text.length <= 2) {
+                          Toast.toast(context, msg: "用户名长度太短");
                           // } else if(_passwordController.text.length <= 6) {
                           //   Toast.toast(context, msg: "密码长度太短");
                           // } else if(_phoneController.text.length != 11) {
                           //   Toast.toast(context, msg: "手机号不符合格式");
-                          } else {
-                            register();
-                          }
+                        } else {
+                          register();
+                        }
+                      },
+                    ),
+                    Center(
+                      child: FlatButton(
+                        child: Text("have an account? login in",
+                          style: TextStyle(
+                            color: const Color(0xff000000),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop();
                         },
                       ),
-                      Center(
-                        child: FlatButton(
-                          child: Text("have an account? login in",
-                            style: TextStyle(
-                              color: const Color(0xff000000),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      )
-                    ]
-                ),
-
-              )
-            ],
-          )
-
-        ]));
+                    )
+                  ]
+              ),
+            ),
+          ),
+        ])
+    );
   }
 
   register() async{
